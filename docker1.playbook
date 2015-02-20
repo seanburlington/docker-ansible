@@ -1,0 +1,29 @@
+# Docker / ansible hello world
+
+
+# Create a a docker container on localhost (this has an ssh server in the image)
+- hosts: localhost
+  sudo: yes
+  tasks:
+  - name: start container 
+    docker: image=base hostname=test name=test detach=False 
+
+# add container(s) to the hosts inventory
+  - name: add new hosts to inventory
+    add_host: hostname="{{ item.Name }}"
+      groups=docker
+      ansible_ssh_host="{{ item.NetworkSettings.IPAddress }}"
+      ansible_ssh_port=22
+    when: item.State.Running == True
+    with_items: docker_containers
+
+
+# Now we can run ansible on teh dockers container(s)
+- hosts: docker
+  sudo: yes
+  remote_user: ansible
+  tasks: 
+    - name: hello
+      shell: echo "hello world" 
+
+
