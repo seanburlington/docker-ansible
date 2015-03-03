@@ -22,6 +22,17 @@ RUN chown -R ansible:ansible /home/ansible/ && chmod 700 /home/ansible/.ssh/ && 
 # set example env variable that will be visible in users shell
 RUN echo "export VISIBLE=now" >> /etc/profile
 
+ADD etc/yum.repos.d/puppet.repo /etc/yum.repos.d/ 
+ADD home/ansible/run-puppet.sh /home/ansible/run-puppet.sh 
+
+RUN yum -y install puppet-3.5.1 facter ruby-shadow
+
+VOLUME ["/vagrant"]
+
+RUN yum -y install http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+
+ 
+
 # run sshd and expose it 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
